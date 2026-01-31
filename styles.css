@@ -52,6 +52,14 @@ body {
     appearance: none;
     display: block;
     opacity: 1;
+    z-index: -1;
+    /* Force hide all controls */
+    -webkit-media-controls: none !important;
+    -webkit-media-controls-enclosure: none !important;
+    -webkit-media-controls-panel: none !important;
+    -webkit-media-controls-play-button: none !important;
+    -webkit-media-controls-start-playback-button: none !important;
+    -webkit-media-controls-overlay-play-button: none !important;
 }
 
 /* Hide all video controls and play buttons */
@@ -97,33 +105,86 @@ body {
     height: 0 !important;
 }
 
-/* Additional mobile-specific hiding */
+/* Additional mobile-specific hiding - Ultra aggressive */
 @media (max-width: 768px) {
     .video-background video {
         -webkit-playsinline: true;
+        -webkit-media-controls: none !important;
     }
     
     .video-background video::-webkit-media-controls {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
     }
     
     .video-background video::-webkit-media-controls-enclosure {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
     }
     
     .video-background video::-webkit-media-controls-panel {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
     }
     
     .video-background video::-webkit-media-controls-play-button {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
     }
     
     .video-background video::-webkit-media-controls-start-playback-button {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
     }
     
     .video-background video::-webkit-media-controls-overlay-play-button {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
+        position: absolute !important;
+        left: -9999px !important;
+    }
+    
+    /* Hide any button elements inside video */
+    .video-background video button {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    
+    /* Hide any overlay elements */
+    .video-background video::before,
+    .video-background video::after {
         display: none !important;
     }
 }
@@ -479,10 +540,10 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Loading state */
+/* Loading state - video visible immediately */
 .video-background video {
-    opacity: 0;
-    transition: opacity 0.5s ease;
+    opacity: 1;
+    transition: none;
 }
 
 .video-background video.loaded {
