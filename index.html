@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
     <meta name="description" content="AppStudio - AI-powered digital platforms designed to turn ideas into real-world impact. Where Innovation Meets Imagination.">
     <meta name="keywords" content="AppStudio, AI, digital platforms, innovation, technology, creative impact">
     <meta name="author" content="AppStudio">
@@ -23,7 +23,7 @@
 <body>
     <!-- Video Background -->
     <div class="video-background">
-        <video autoplay muted loop playsinline>
+        <video autoplay muted loop playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback">
             <source src="video/bg.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -66,13 +66,34 @@
     </div>
 
     <script>
-        // Video loading handler
+        // Video loading handler and mobile fix
         document.addEventListener('DOMContentLoaded', function() {
             const video = document.querySelector('.video-background video');
             if (video) {
+                // Force play on mobile
+                video.setAttribute('playsinline', 'true');
+                video.setAttribute('webkit-playsinline', 'true');
+                video.setAttribute('muted', 'true');
+                video.muted = true;
+                
+                // Try to play the video
+                const playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(function(error) {
+                        console.log('Video autoplay prevented:', error);
+                        // Try again on user interaction
+                        document.addEventListener('touchstart', function() {
+                            video.play().catch(function(err) {
+                                console.log('Video play failed:', err);
+                            });
+                        }, { once: true });
+                    });
+                }
+                
                 video.addEventListener('loadeddata', function() {
                     video.classList.add('loaded');
                 });
+                
                 // Fallback if loadeddata doesn't fire
                 setTimeout(function() {
                     video.classList.add('loaded');

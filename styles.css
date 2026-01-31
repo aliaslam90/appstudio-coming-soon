@@ -7,9 +7,16 @@
 html, body {
     height: 100%;
     width: 100%;
-    overflow: hidden;
     margin: 0;
     padding: 0;
+    overflow-x: hidden;
+}
+
+@media (max-width: 768px) {
+    html, body {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 body {
@@ -39,6 +46,30 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     object-fit: cover;
+    pointer-events: none;
+    -webkit-playsinline: true;
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.video-background video::-webkit-media-controls {
+    display: none !important;
+}
+
+.video-background video::-webkit-media-controls-enclosure {
+    display: none !important;
+}
+
+.video-background video::-webkit-media-controls-panel {
+    display: none !important;
+}
+
+.video-background video::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+.video-background video::-webkit-media-controls-start-playback-button {
+    display: none !important;
 }
 
 /* Overlay for better text readability */
@@ -56,12 +87,20 @@ body {
 .container {
     position: relative;
     z-index: 1;
-    height: 100vh;
+    min-height: 100vh;
+    height: auto;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     padding: clamp(0.5rem, 2vh, 2rem);
-    overflow: hidden;
+}
+
+@media (max-width: 768px) {
+    .container {
+        min-height: 100vh;
+        height: auto;
+        overflow: visible;
+    }
 }
 
 /* Header with Logo */
@@ -288,6 +327,49 @@ body {
     font-family: 'Playfair Display', serif;
     font-weight: 300;
     font-size: clamp(0.7rem, 1.2vh, 0.9rem);
+}
+
+/* Mobile Responsive Design */
+@media (max-width: 768px) {
+    .headline {
+        font-size: clamp(1.8rem, 6vw, 3rem);
+        line-height: 1.2;
+        margin-bottom: clamp(0.8rem, 2vh, 1.5rem);
+    }
+
+    .description {
+        font-size: clamp(0.9rem, 3vw, 1.2rem);
+        line-height: 1.5;
+        margin-bottom: clamp(0.8rem, 2vh, 1.2rem);
+        padding: 0 1rem;
+    }
+
+    .tagline {
+        font-size: clamp(0.85rem, 2.5vw, 1.1rem);
+        margin-bottom: clamp(2rem, 5vh, 4rem);
+    }
+
+    .cta-button {
+        padding: clamp(0.8rem, 2vh, 1rem) clamp(2rem, 6vw, 3rem);
+        font-size: clamp(0.9rem, 2.5vw, 1.2rem);
+    }
+
+    .logo {
+        height: clamp(35px, 5vh, 50px);
+    }
+
+    .main-content {
+        padding: clamp(1rem, 3vh, 2rem) 0 clamp(3rem, 6vh, 5rem) 0;
+    }
+
+    .header {
+        padding: clamp(0.8rem, 2vh, 1.2rem) 0;
+        padding-left: clamp(1rem, 3vw, 1.5rem);
+    }
+
+    .footer {
+        padding: clamp(1rem, 2vh, 1.5rem) 0;
+    }
 }
 
 /* Responsive Design - Height-based adjustments */
