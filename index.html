@@ -31,7 +31,7 @@
 
     <!-- Background -->
     <div class="video-background">
-        <video id="bgVideo" src="video/bg1.mp4" autoplay loop muted playsinline class="bg-video" preload="auto" webkit-playsinline="true" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" x-webkit-airplay="allow"></video>
+        <video id="bgVideo" src="video/bg1.mp4" autoplay loop muted playsinline class="bg-video" preload="auto" webkit-playsinline="true" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" x-webkit-airplay="allow" style="pointer-events: none;"></video>
     </div>
     <div class="video-overlay"></div>
 
@@ -111,16 +111,15 @@
 
         // Configure video for autoplay on mobile (mandatory setup)
         if (bgVideo) {
-            // Explicitly remove controls - multiple methods
+            // Explicitly remove controls
             bgVideo.removeAttribute('controls');
             bgVideo.controls = false;
-            bgVideo.setAttribute('controls', 'false');
             
-            // Mandatory attributes for mobile autoplay
+            // Programmatically enforce required attributes
             bgVideo.muted = true;
-            bgVideo.setAttribute('muted', 'true');
-            bgVideo.setAttribute('playsinline', 'true');
-            bgVideo.setAttribute('webkit-playsinline', 'true');
+            bgVideo.setAttribute('muted', '');
+            bgVideo.setAttribute('playsinline', '');
+            bgVideo.setAttribute('webkit-playsinline', '');
             bgVideo.setAttribute('autoplay', 'true');
             bgVideo.setAttribute('loop', 'true');
             bgVideo.setAttribute('preload', 'auto');
@@ -128,38 +127,31 @@
             // Force video to be treated as background (no controls)
             bgVideo.setAttribute('controlsList', 'nodownload nofullscreen noremoteplayback');
             
-            // Additional iOS-specific attributes
-            bgVideo.setAttribute('x5-video-player-type', 'h5');
-            bgVideo.setAttribute('x5-video-player-fullscreen', 'false');
-            bgVideo.setAttribute('x5-video-orientation', 'portraint');
-            
             // Prevent any UI from showing
             bgVideo.style.pointerEvents = 'none';
         }
 
-        // Force video playback function
-        function forceVideoPlay() {
-            if (bgVideo) {
+        // Force video playback function with async/await
+        async function forceVideoPlay() {
+            if (!bgVideo) return;
+            
+            try {
                 // Ensure muted is explicitly set to true
                 bgVideo.muted = true;
+                bgVideo.setAttribute('muted', '');
+                bgVideo.setAttribute('playsinline', '');
+                bgVideo.setAttribute('webkit-playsinline', '');
                 
-                // Force play with try/catch
-                try {
-                    const playPromise = bgVideo.play();
-                    if (playPromise !== undefined) {
-                        playPromise.then(() => {
-                            // Video started playing successfully
-                            bgVideo.style.opacity = '1';
-                        }).catch(error => {
-                            // Autoplay was prevented - video will show as background (poster/first frame)
-                            // Do NOT show play button - just let it be a static background
-                            console.log('Video autoplay prevented by browser:', error);
-                        });
-                    }
-                } catch (error) {
-                    // Fallback: video remains as background image
-                    console.log('Video play error:', error);
-                }
+                // Attempt to play video
+                await bgVideo.play();
+                // Video started playing successfully
+                bgVideo.style.opacity = '1';
+            } catch (error) {
+                // Autoplay was prevented - video will show as background (poster/first frame)
+                // Do NOT show play button - just let it be a static background
+                console.log('Video autoplay prevented by browser:', error);
+                // Keep video visible as static background
+                bgVideo.style.opacity = '1';
             }
         }
 
@@ -201,12 +193,24 @@
             }
         }
 
-        // Video loaded event
+        // Video loaded event - re-try on loadedmetadata as required
         if (bgVideo) {
             // Configure video immediately on load
             bgVideo.muted = true;
-            bgVideo.setAttribute('playsinline', 'true');
-            bgVideo.setAttribute('webkit-playsinline', 'true');
+            bgVideo.setAttribute('muted', '');
+            bgVideo.setAttribute('playsinline', '');
+            bgVideo.setAttribute('webkit-playsinline', '');
+            
+            // Re-try on loadedmetadata (required)
+            bgVideo.addEventListener('loadedmetadata', function() {
+                // Ensure attributes are set
+                bgVideo.muted = true;
+                bgVideo.setAttribute('muted', '');
+                bgVideo.setAttribute('playsinline', '');
+                bgVideo.setAttribute('webkit-playsinline', '');
+                // Try to play
+                forceVideoPlay();
+            });
             
             bgVideo.addEventListener('loadeddata', function() {
                 videoLoaded = true;
@@ -259,25 +263,12 @@
         document.addEventListener('DOMContentLoaded', function() {
             if (bgVideo) {
                 bgVideo.muted = true;
-                bgVideo.setAttribute('playsinline', 'true');
-                bgVideo.setAttribute('webkit-playsinline', 'true');
+                bgVideo.setAttribute('muted', '');
+                bgVideo.setAttribute('playsinline', '');
+                bgVideo.setAttribute('webkit-playsinline', '');
                 // Try early play attempt
                 setTimeout(forceVideoPlay, 100);
             }
-        });
-
-        // Mobile: Try to play video on first user interaction (if autoplay was blocked)
-        let userInteracted = false;
-        const interactionEvents = ['touchstart', 'touchend', 'click', 'scroll'];
-        
-        interactionEvents.forEach(event => {
-            document.addEventListener(event, function() {
-                if (!userInteracted && bgVideo && bgVideo.paused) {
-                    userInteracted = true;
-                    // Try to play on first interaction
-                    forceVideoPlay();
-                }
-            }, { once: true, passive: true });
         });
     </script>
 </body>
