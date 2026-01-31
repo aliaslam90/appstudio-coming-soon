@@ -297,6 +297,38 @@ video:not([controls]) {
     -webkit-appearance: none;
 }
 
+/* Additional mobile-specific hiding - ensure NO play button appears */
+.bg-video {
+    /* Prevent any native play overlay on iOS */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide any potential play button overlays on mobile */
+.bg-video::before,
+.bg-video::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Ensure video poster/thumbnail doesn't show play button */
+.bg-video[poster] {
+    pointer-events: none;
+}
+
+/* Mobile Safari specific - hide any play indicators */
+@media (max-width: 768px) {
+    .bg-video {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+    }
+    
+    /* Ensure no tap-to-play overlay */
+    .bg-video::-webkit-media-controls-overlay-play-button {
+        display: none !important;
+    }
+}
+
 
 /* Overlay for better text readability */
 .video-overlay {
