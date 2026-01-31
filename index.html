@@ -23,11 +23,32 @@
 <body>
     <!-- Video Background -->
     <div class="video-background">
-        <video autoplay muted loop playsinline webkit-playsinline preload="auto" x-webkit-airplay="allow" disablePictureInPicture>
+        <video id="bgVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" x-webkit-airplay="allow" disablePictureInPicture style="width: 100%; height: 100%; object-fit: cover; -webkit-media-controls: none; -webkit-media-controls-enclosure: none;">
             <source src="video/bg.mp4" type="video/mp4">
         </video>
     </div>
     <div class="video-overlay"></div>
+    
+    <script>
+        // Ensure video plays on iOS
+        (function() {
+            var video = document.getElementById('bgVideo');
+            if (video) {
+                video.muted = true;
+                video.playsInline = true;
+                video.setAttribute('playsinline', '');
+                video.setAttribute('webkit-playsinline', '');
+                
+                // Force play
+                var playPromise = video.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(function() {
+                        // Video will play on first interaction if autoplay blocked
+                    });
+                }
+            }
+        })();
+    </script>
 
     <!-- Main Container -->
     <div class="container">
