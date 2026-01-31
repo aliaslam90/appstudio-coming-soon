@@ -50,6 +50,69 @@ body {
     display: block;
     opacity: 1;
     z-index: -1;
+    /* Hide all controls and play buttons */
+    -webkit-media-controls: none !important;
+    -webkit-media-controls-enclosure: none !important;
+    -webkit-media-controls-panel: none !important;
+    -webkit-media-controls-play-button: none !important;
+    -webkit-media-controls-start-playback-button: none !important;
+    -webkit-media-controls-overlay-play-button: none !important;
+}
+
+/* Hide video controls */
+.video-background video::-webkit-media-controls {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.video-background video::-webkit-media-controls-enclosure {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.video-background video::-webkit-media-controls-panel {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+}
+
+.video-background video::-webkit-media-controls-play-button {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.video-background video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.video-background video::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    pointer-events: none !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* iOS specific fixes */
+@supports (-webkit-touch-callout: none) {
+    .video-background video {
+        -webkit-playsinline: true;
+    }
 }
 
 /* Overlay for better text readability */
