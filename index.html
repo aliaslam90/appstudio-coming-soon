@@ -23,7 +23,7 @@
 <body>
     <!-- Video Background -->
     <div class="video-background">
-        <video autoplay muted loop playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback">
+        <video autoplay muted loop playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" style="display: block;" id="bgVideo">
             <source src="video/bg.mp4" type="video/mp4">
             Your browser does not support the video tag.
         </video>
@@ -66,40 +66,75 @@
     </div>
 
     <script>
-        // Video loading handler and mobile fix
-        document.addEventListener('DOMContentLoaded', function() {
-            const video = document.querySelector('.video-background video');
+        // Video loading handler and mobile fix - immediate play
+        (function() {
+            const video = document.getElementById('bgVideo') || document.querySelector('.video-background video');
             if (video) {
-                // Force play on mobile
+                // Set all attributes immediately
                 video.setAttribute('playsinline', 'true');
                 video.setAttribute('webkit-playsinline', 'true');
                 video.setAttribute('muted', 'true');
+                video.setAttribute('autoplay', 'true');
+                video.setAttribute('loop', 'true');
                 video.muted = true;
+                video.playsInline = true;
                 
-                // Try to play the video
-                const playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(function(error) {
-                        console.log('Video autoplay prevented:', error);
-                        // Try again on user interaction
-                        document.addEventListener('touchstart', function() {
-                            video.play().catch(function(err) {
-                                console.log('Video play failed:', err);
-                            });
-                        }, { once: true });
-                    });
+                // Hide controls immediately
+                video.controls = false;
+                video.removeAttribute('controls');
+                
+                // Force play immediately
+                function playVideo() {
+                    const playPromise = video.play();
+                    if (playPromise !== undefined) {
+                        playPromise.then(function() {
+                            // Video is playing
+                            video.classList.add('loaded');
+                        }).catch(function(error) {
+                            console.log('Video autoplay prevented:', error);
+                            // Retry immediately
+                            setTimeout(function() {
+                                video.play().catch(function(err) {
+                                    console.log('Retry failed:', err);
+                                });
+                            }, 100);
+                        });
+                    }
                 }
                 
-                video.addEventListener('loadeddata', function() {
-                    video.classList.add('loaded');
-                });
+                // Try to play immediately
+                if (video.readyState >= 2) {
+                    playVideo();
+                } else {
+                    video.addEventListener('loadedmetadata', playVideo, { once: true });
+                    video.addEventListener('canplay', playVideo, { once: true });
+                    video.addEventListener('loadeddata', function() {
+                        playVideo();
+                        video.classList.add('loaded');
+                    }, { once: true });
+                }
                 
-                // Fallback if loadeddata doesn't fire
+                // Fallback - play after short delay
                 setTimeout(function() {
+                    if (video.paused) {
+                        playVideo();
+                    }
                     video.classList.add('loaded');
+                }, 200);
+                
+                // Hide any controls that might appear
+                setInterval(function() {
+                    video.controls = false;
+                    video.removeAttribute('controls');
+                    const controls = video.querySelectorAll('*');
+                    controls.forEach(function(el) {
+                        if (el.classList && (el.classList.contains('media-controls') || el.classList.contains('play-button'))) {
+                            el.style.display = 'none';
+                        }
+                    });
                 }, 100);
             }
-        });
+        })();
 
 
         // Modal functionality

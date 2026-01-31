@@ -50,26 +50,82 @@ body {
     -webkit-playsinline: true;
     -webkit-appearance: none;
     appearance: none;
+    display: block;
+    opacity: 1;
 }
 
+/* Hide all video controls and play buttons */
 .video-background video::-webkit-media-controls {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 .video-background video::-webkit-media-controls-enclosure {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 .video-background video::-webkit-media-controls-panel {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 .video-background video::-webkit-media-controls-play-button {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
 }
 
 .video-background video::-webkit-media-controls-start-playback-button {
     display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+.video-background video::-webkit-media-controls-overlay-play-button {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    height: 0 !important;
+}
+
+/* Additional mobile-specific hiding */
+@media (max-width: 768px) {
+    .video-background video {
+        -webkit-playsinline: true;
+    }
+    
+    .video-background video::-webkit-media-controls {
+        display: none !important;
+    }
+    
+    .video-background video::-webkit-media-controls-enclosure {
+        display: none !important;
+    }
+    
+    .video-background video::-webkit-media-controls-panel {
+        display: none !important;
+    }
+    
+    .video-background video::-webkit-media-controls-play-button {
+        display: none !important;
+    }
+    
+    .video-background video::-webkit-media-controls-start-playback-button {
+        display: none !important;
+    }
+    
+    .video-background video::-webkit-media-controls-overlay-play-button {
+        display: none !important;
+    }
 }
 
 /* Overlay for better text readability */
