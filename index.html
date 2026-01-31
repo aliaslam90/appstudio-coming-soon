@@ -23,93 +23,50 @@
 <body>
     <!-- Video Background -->
     <div class="video-background">
-        <video autoplay muted loop playsinline webkit-playsinline x-webkit-airplay="allow" preload="auto" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" style="display: block; -webkit-media-controls: none !important; pointer-events: none;" id="bgVideo">
+        <video autoplay muted loop playsinline preload="auto" id="bgVideo">
             <source src="video/bg.mp4" type="video/mp4">
-            Your browser does not support the video tag.
         </video>
     </div>
     <div class="video-overlay"></div>
     
-    <!-- Immediate video play script - runs before page fully loads -->
+    <!-- Simple video initialization -->
     <script>
         (function() {
-            // Start immediately, don't wait for DOMContentLoaded
-            function initVideo() {
-                const video = document.getElementById('bgVideo');
-                if (!video) {
-                    // Retry if video not found yet
-                    requestAnimationFrame(initVideo);
-                    return;
-                }
-                
-                // Set attributes immediately
-                video.setAttribute('playsinline', 'true');
-                video.setAttribute('webkit-playsinline', 'true');
-                video.setAttribute('muted', 'true');
-                video.setAttribute('autoplay', 'true');
-                video.setAttribute('loop', 'true');
+            const video = document.getElementById('bgVideo');
+            if (video) {
+                // Set properties immediately
                 video.muted = true;
                 video.playsInline = true;
-                video.controls = false;
-                video.removeAttribute('controls');
+                video.setAttribute('playsinline', '');
+                video.setAttribute('webkit-playsinline', '');
                 
-                // Force play immediately - don't wait for events
-                function forcePlay() {
-                    const playPromise = video.play();
-                    if (playPromise !== undefined) {
-                        playPromise.then(function() {
-                            video.classList.add('loaded');
-                        }).catch(function(error) {
-                            // Retry immediately on failure
-                            setTimeout(forcePlay, 10);
+                // Try to play immediately
+                function tryPlay() {
+                    if (video.paused) {
+                        video.play().catch(function() {
+                            // If autoplay fails, play on first user interaction
+                            const playOnInteraction = function() {
+                                video.play();
+                                document.removeEventListener('touchstart', playOnInteraction);
+                                document.removeEventListener('click', playOnInteraction);
+                            };
+                            document.addEventListener('touchstart', playOnInteraction, { once: true });
+                            document.addEventListener('click', playOnInteraction, { once: true });
                         });
                     }
                 }
                 
-                // Try to play immediately
-                forcePlay();
+                // Try immediately
+                tryPlay();
                 
-                // Also try on various events for maximum compatibility
-                ['loadedmetadata', 'canplay', 'canplaythrough', 'loadeddata'].forEach(function(event) {
-                    video.addEventListener(event, forcePlay, { once: true });
-                });
-                
-                // Aggressively hide controls
-                function hideAllControls() {
-                    video.controls = false;
-                    video.removeAttribute('controls');
-                    try {
-                        const shadowRoot = video.shadowRoot;
-                        if (shadowRoot) {
-                            const controls = shadowRoot.querySelectorAll('*');
-                            controls.forEach(function(el) {
-                                el.style.display = 'none';
-                                el.style.opacity = '0';
-                                el.style.visibility = 'hidden';
-                            });
-                        }
-                    } catch(e) {}
+                // Also try when video is ready
+                if (video.readyState >= 2) {
+                    tryPlay();
+                } else {
+                    video.addEventListener('loadeddata', tryPlay, { once: true });
+                    video.addEventListener('canplay', tryPlay, { once: true });
                 }
-                
-                hideAllControls();
-                setInterval(hideAllControls, 50);
-                ['play', 'playing', 'loadedmetadata', 'canplay'].forEach(function(event) {
-                    video.addEventListener(event, hideAllControls);
-                });
             }
-            
-            // Start immediately
-            if (document.readyState === 'loading') {
-                // If still loading, try immediately and also on DOMContentLoaded
-                initVideo();
-                document.addEventListener('DOMContentLoaded', initVideo);
-            } else {
-                // Already loaded, run immediately
-                initVideo();
-            }
-            
-            // Also try on next frame
-            requestAnimationFrame(initVideo);
         })();
     </script>
 
