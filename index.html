@@ -21,95 +21,11 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Video Background -->
+    <!-- Background -->
     <div class="video-background">
-        <!-- Use GIF as background (no play button!) -->
         <img id="bgGif" src="video/bg.gif" alt="" class="bg-gif">
-        <video id="bgVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" x-webkit-airplay="allow" disablePictureInPicture style="display: none;">
-            <source src="video/bg.mov" type="video/quicktime">
-            <source src="video/bg.mp4" type="video/mp4">
-        </video>
     </div>
     <div class="video-overlay"></div>
-    
-    <script>
-        // GIF is primary background - no play button issues!
-        (function() {
-            var gif = document.getElementById('bgGif');
-            var video = document.getElementById('bgVideo');
-            
-            // Hide video, use GIF
-            if (gif) {
-                gif.style.display = 'block';
-            }
-            if (video) {
-                video.style.display = 'none';
-            }
-            
-            // Fallback: if GIF fails to load, use video
-            if (gif) {
-                gif.onerror = function() {
-                    // GIF failed, fallback to video
-                    if (video) {
-                        gif.style.display = 'none';
-                        video.style.display = 'block';
-                        
-                        // Video fallback code (only if GIF fails)
-                        video.muted = true;
-                        video.playsInline = true;
-                        video.setAttribute('playsinline', '');
-                        video.setAttribute('webkit-playsinline', '');
-                        video.controls = false;
-                        video.removeAttribute('controls');
-                        
-                        // Function to hide play button (video fallback only)
-                        function hidePlayButton() {
-                            var buttons = document.querySelectorAll('button, [class*="play"], [id*="play"]');
-                            buttons.forEach(function(btn) {
-                                if (btn.closest('.video-background') || video.contains(btn)) {
-                                    btn.style.display = 'none';
-                                    btn.style.opacity = '0';
-                                    btn.style.visibility = 'hidden';
-                                    btn.style.pointerEvents = 'none';
-                                }
-                            });
-                            
-                            try {
-                                if (video.shadowRoot) {
-                                    var shadowControls = video.shadowRoot.querySelectorAll('*');
-                                    shadowControls.forEach(function(el) {
-                                        el.style.display = 'none';
-                                    });
-                                }
-                            } catch(e) {}
-                        }
-                        
-                        // Force play video (fallback only)
-                        function forcePlay() {
-                            if (video.paused) {
-                                video.play().then(function() {
-                                    hidePlayButton();
-                                }).catch(function() {
-                                    hidePlayButton();
-                                });
-                            } else {
-                                hidePlayButton();
-                            }
-                        }
-                        
-                        forcePlay();
-                        ['loadedmetadata', 'canplay', 'canplaythrough', 'loadeddata', 'play', 'playing'].forEach(function(event) {
-                            video.addEventListener(event, function() {
-                                forcePlay();
-                                hidePlayButton();
-                            });
-                        });
-                        setInterval(hidePlayButton, 100);
-                    }
-                };
-            }
-        })();
-    </script>
 
     <!-- Main Container -->
     <div class="container">
