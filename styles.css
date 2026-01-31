@@ -23,7 +23,16 @@ body {
     font-family: 'Playfair Display', serif;
     position: relative;
     background: #000;
-    overflow: hidden;
+    overflow-x: hidden;
+}
+
+/* Enable scrolling on mobile */
+@media (max-width: 768px) {
+    body {
+        overflow-y: auto;
+        overflow-x: hidden;
+        -webkit-overflow-scrolling: touch;
+    }
 }
 
 /* Loading Screen */
@@ -301,6 +310,8 @@ video:not([controls]) {
 .bg-video {
     /* Prevent any native play overlay on iOS */
     -webkit-tap-highlight-color: transparent;
+    /* Force no controls */
+    controls: none;
 }
 
 /* Hide any potential play button overlays on mobile */
@@ -321,12 +332,39 @@ video:not([controls]) {
         -webkit-touch-callout: none;
         -webkit-user-select: none;
         user-select: none;
+        /* Aggressively hide all controls */
+        -webkit-appearance: none;
+        appearance: none;
     }
     
     /* Ensure no tap-to-play overlay */
     .bg-video::-webkit-media-controls-overlay-play-button {
         display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
     }
+    
+    /* Hide any iOS play button */
+    .bg-video::-webkit-media-controls-start-playback-button {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+}
+
+/* Additional aggressive hiding for all browsers */
+.bg-video::-webkit-media-controls-overlay-enclosure {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.bg-video::-webkit-media-controls-enclosure {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 
@@ -359,6 +397,8 @@ video:not([controls]) {
         min-height: 100vh;
         height: auto;
         overflow: visible;
+        /* Ensure footer is visible and scrollable */
+        padding-bottom: 2rem;
     }
 }
 
@@ -391,7 +431,15 @@ video:not([controls]) {
     margin: 0 auto;
     width: 100%;
     min-height: 0;
-    overflow: hidden;
+    overflow: visible;
+}
+
+/* Ensure scrolling works on mobile */
+@media (max-width: 768px) {
+    .main-content {
+        overflow: visible;
+        padding-bottom: clamp(2rem, 5vh, 4rem);
+    }
 }
 
 /* Headline */
@@ -515,6 +563,18 @@ video:not([controls]) {
     text-align: center;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     flex-shrink: 0;
+    position: relative;
+    z-index: 1;
+    margin-top: auto;
+}
+
+/* Ensure footer is visible on mobile */
+@media (max-width: 768px) {
+    .footer {
+        padding: clamp(1rem, 3vh, 2rem) clamp(1rem, 4vw, 2rem);
+        margin-top: 2rem;
+        min-height: auto;
+    }
 }
 
 .footer-content {

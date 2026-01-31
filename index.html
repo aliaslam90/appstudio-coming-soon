@@ -111,9 +111,10 @@
 
         // Configure video for autoplay on mobile (mandatory setup)
         if (bgVideo) {
-            // Explicitly remove controls
+            // Explicitly remove controls - multiple methods
             bgVideo.removeAttribute('controls');
             bgVideo.controls = false;
+            bgVideo.setAttribute('controls', 'false');
             
             // Mandatory attributes for mobile autoplay
             bgVideo.muted = true;
@@ -126,6 +127,14 @@
             
             // Force video to be treated as background (no controls)
             bgVideo.setAttribute('controlsList', 'nodownload nofullscreen noremoteplayback');
+            
+            // Additional iOS-specific attributes
+            bgVideo.setAttribute('x5-video-player-type', 'h5');
+            bgVideo.setAttribute('x5-video-player-fullscreen', 'false');
+            bgVideo.setAttribute('x5-video-orientation', 'portraint');
+            
+            // Prevent any UI from showing
+            bgVideo.style.pointerEvents = 'none';
         }
 
         // Force video playback function
@@ -158,7 +167,15 @@
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
-                document.body.style.overflow = '';
+                // Enable scrolling on mobile
+                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                                (window.innerWidth <= 768 && 'ontouchstart' in window);
+                if (isMobile) {
+                    document.body.style.overflowY = 'auto';
+                    document.body.style.overflowX = 'hidden';
+                } else {
+                    document.body.style.overflow = '';
+                }
                 
                 // Force video playback after loading screen finishes
                 forceVideoPlay();
@@ -247,6 +264,20 @@
                 // Try early play attempt
                 setTimeout(forceVideoPlay, 100);
             }
+        });
+
+        // Mobile: Try to play video on first user interaction (if autoplay was blocked)
+        let userInteracted = false;
+        const interactionEvents = ['touchstart', 'touchend', 'click', 'scroll'];
+        
+        interactionEvents.forEach(event => {
+            document.addEventListener(event, function() {
+                if (!userInteracted && bgVideo && bgVideo.paused) {
+                    userInteracted = true;
+                    // Try to play on first interaction
+                    forceVideoPlay();
+                }
+            }, { once: true, passive: true });
         });
     </script>
 </body>
