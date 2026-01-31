@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AppStudio - AI-powered digital platforms designed to turn ideas into real-world impact. Where Innovation Meets Imagination.">
+    <meta name="keywords" content="AppStudio, AI, digital platforms, innovation, technology, creative impact">
+    <meta name="author" content="AppStudio">
+    <meta property="og:title" content="AppStudio - Bridging Technology, Intelligence and Creative Impact">
+    <meta property="og:description" content="AI-powered digital platforms designed to turn ideas into real-world impact.">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>AppStudio - Bridging Technology, Intelligence and Creative Impact</title>
+    
+    <!-- Google Fonts - Playfair Display -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- External CSS -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Video Background -->
+    <div class="video-background">
+        <video autoplay muted loop playsinline>
+            <source src="video/bg.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+    </div>
+    <div class="video-overlay"></div>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <img src="image/logo.png" alt="AppStudio Logo" class="logo">
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h1 class="headline">Bridging Technology,<br>Intelligence and Creative Impact</h1>
+            <p class="description">AI-powered digital platforms designed to turn ideas into real-world impact.</p>
+            <p class="tagline">Where Innovation Meets Imagination.</p>
+            <a href="#" class="cta-button" id="contactButton">Connect with our team</a>
+        </main>
+
+        <!-- Footer -->
+        <footer class="footer" id="contact">
+            <div class="footer-content">
+                <p class="copyright">Copyright © 2026 AppStudio. All rights reserved.</p>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Contact Modal -->
+    <div class="modal-overlay" id="contactModal">
+        <div class="modal-content">
+            <button class="modal-close" id="closeModal">&times;</button>
+            <h2 class="modal-title">GET IN TOUCH</h2>
+            <div class="email-field">
+                <span class="email-address">hello@appstudio.ae</span>
+            </div>
+            <a href="mailto:hello@appstudio.ae" class="email-button">Email to us</a>
+        </div>
+    </div>
+
+    <script>
+        // Video loading handler
+        document.addEventListener('DOMContentLoaded', function() {
+            const video = document.querySelector('.video-background video');
+            if (video) {
+                video.addEventListener('loadeddata', function() {
+                    video.classList.add('loaded');
+                });
+                // Fallback if loadeddata doesn't fire
+                setTimeout(function() {
+                    video.classList.add('loaded');
+                }, 100);
+            }
+        });
+
+
+        // Modal functionality
+        const contactButton = document.getElementById('contactButton');
+        const contactModal = document.getElementById('contactModal');
+        const closeModal = document.getElementById('closeModal');
+
+        // Open modal
+        contactButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            contactModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Close modal
+        closeModal.addEventListener('click', function() {
+            contactModal.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+        // Close modal when clicking outside
+        contactModal.addEventListener('click', function(e) {
+            if (e.target === contactModal) {
+                contactModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && contactModal.classList.contains('active')) {
+                contactModal.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        });
+    </script>
+</body>
+</html>
