@@ -26,26 +26,79 @@
         <video id="bgVideo" autoplay muted loop playsinline webkit-playsinline preload="auto" x-webkit-airplay="allow" disablePictureInPicture style="width: 100%; height: 100%; object-fit: cover; -webkit-media-controls: none; -webkit-media-controls-enclosure: none;">
             <source src="video/bg.mp4" type="video/mp4">
         </video>
+        <div class="video-play-button-overlay"></div>
     </div>
     <div class="video-overlay"></div>
     
     <script>
-        // Ensure video plays on iOS
+        // Aggressively ensure video plays and hide play button
         (function() {
             var video = document.getElementById('bgVideo');
             if (video) {
+                // Set all properties
                 video.muted = true;
                 video.playsInline = true;
                 video.setAttribute('playsinline', '');
                 video.setAttribute('webkit-playsinline', '');
+                video.controls = false;
+                video.removeAttribute('controls');
                 
-                // Force play
-                var playPromise = video.play();
-                if (playPromise !== undefined) {
-                    playPromise.catch(function() {
-                        // Video will play on first interaction if autoplay blocked
+                // Function to hide play button
+                function hidePlayButton() {
+                    // Hide any play buttons
+                    var buttons = document.querySelectorAll('button, [class*="play"], [id*="play"]');
+                    buttons.forEach(function(btn) {
+                        if (btn.closest('.video-background') || video.contains(btn)) {
+                            btn.style.display = 'none';
+                            btn.style.opacity = '0';
+                            btn.style.visibility = 'hidden';
+                            btn.style.pointerEvents = 'none';
+                        }
                     });
+                    
+                    // Hide shadow DOM controls (Safari)
+                    try {
+                        if (video.shadowRoot) {
+                            var shadowControls = video.shadowRoot.querySelectorAll('*');
+                            shadowControls.forEach(function(el) {
+                                el.style.display = 'none';
+                            });
+                        }
+                    } catch(e) {}
                 }
+                
+                // Force play immediately
+                function forcePlay() {
+                    if (video.paused) {
+                        video.play().then(function() {
+                            hidePlayButton();
+                        }).catch(function() {
+                            hidePlayButton();
+                        });
+                    } else {
+                        hidePlayButton();
+                    }
+                }
+                
+                // Try to play immediately
+                forcePlay();
+                
+                // Try on various events
+                ['loadedmetadata', 'canplay', 'canplaythrough', 'loadeddata', 'play', 'playing'].forEach(function(event) {
+                    video.addEventListener(event, function() {
+                        forcePlay();
+                        hidePlayButton();
+                    });
+                });
+                
+                // Continuously hide play button
+                setInterval(hidePlayButton, 100);
+                
+                // Hide on page load
+                window.addEventListener('load', function() {
+                    forcePlay();
+                    hidePlayButton();
+                });
             }
         })();
     </script>
