@@ -99,19 +99,43 @@ body {
     height: 100%;
     z-index: -1;
     overflow: hidden;
+    /* Ensure proper scaling on all devices */
+    -webkit-transform: translateZ(0);
+    transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+}
+
+/* Responsive video container adjustments */
+@media (max-width: 768px) {
+    .video-background {
+        width: 100vw;
+        height: 100vh;
+        min-width: 100%;
+        min-height: 100%;
+    }
+}
+
+/* Landscape mobile */
+@media (max-width: 768px) and (orientation: landscape) {
+    .video-background {
+        width: 100vw;
+        height: 100vh;
+    }
 }
 
 /* Video Background */
 .bg-video {
     min-width: 100%;
     min-height: 100%;
-    width: auto;
-    height: auto;
+    width: 100%;
+    height: 100%;
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     object-fit: cover;
+    object-position: center center;
     pointer-events: none;
     display: block;
     opacity: 1;
@@ -120,6 +144,102 @@ body {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
+}
+
+/* Responsive video adjustments for different screen sizes */
+@media (max-width: 768px) {
+    .bg-video {
+        width: 100%;
+        height: 100%;
+        min-width: 100%;
+        min-height: 100%;
+        object-fit: cover;
+        object-position: center center;
+    }
+}
+
+/* Landscape mobile devices */
+@media (max-width: 768px) and (orientation: landscape) {
+    .bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+    }
+}
+
+/* Small mobile devices */
+@media (max-width: 480px) {
+    .bg-video {
+        width: 100%;
+        height: 100%;
+        min-width: 100%;
+        min-height: 100%;
+        object-fit: cover;
+    }
+}
+
+/* Very small screens */
+@media (max-width: 360px) {
+    .bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+    }
+}
+
+/* Tablet devices */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+/* Large screens */
+@media (min-width: 1920px) {
+    .bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+/* Tall screens (portrait tablets, etc.) */
+@media (max-height: 600px) and (orientation: portrait) {
+    .bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center center;
+    }
+}
+
+/* Ultra-wide screens */
+@media (min-width: 2560px) {
+    .bg-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+}
+
+/* Performance optimization for mobile */
+@media (max-width: 768px) {
+    .bg-video {
+        /* Optimize rendering on mobile */
+        -webkit-transform: translate3d(-50%, -50%, 0);
+        transform: translate3d(-50%, -50%, 0);
+        will-change: transform;
+    }
+    
+    .video-background {
+        /* Hardware acceleration */
+        -webkit-transform: translate3d(0, 0, 0);
+        transform: translate3d(0, 0, 0);
+    }
 }
 
 /* Hide native video controls completely */
@@ -177,60 +297,6 @@ video:not([controls]) {
     -webkit-appearance: none;
 }
 
-/* Mobile Play Button Overlay */
-.mobile-play-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 100;
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(2px);
-    pointer-events: auto;
-}
-
-.mobile-play-overlay.show {
-    display: flex;
-}
-
-.mobile-play-button {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 0;
-    outline: none;
-    transition: transform 0.3s ease, opacity 0.3s ease;
-    pointer-events: auto;
-}
-
-.mobile-play-button:active {
-    transform: scale(0.9);
-}
-
-.mobile-play-button svg {
-    filter: drop-shadow(0 4px 12px rgba(86, 252, 138, 0.5));
-    transition: filter 0.3s ease;
-}
-
-.mobile-play-button:hover svg,
-.mobile-play-button:focus svg {
-    filter: drop-shadow(0 6px 16px rgba(86, 252, 138, 0.7));
-}
-
-.mobile-play-button:hover {
-    transform: scale(1.1);
-}
-
-/* Hide play overlay on desktop */
-@media (min-width: 769px) {
-    .mobile-play-overlay {
-        display: none !important;
-    }
-}
 
 /* Overlay for better text readability */
 .video-overlay {
