@@ -31,7 +31,16 @@
 
     <!-- Background -->
     <div class="video-background">
-        <video id="bgVideo" src="video/bg1.mp4" autoplay loop muted playsinline class="bg-video"></video>
+        <video id="bgVideo" src="video/bg1.mp4" autoplay loop muted playsinline class="bg-video" preload="auto" webkit-playsinline="true" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback"></video>
+        <!-- Mobile Play Button -->
+        <div class="mobile-play-overlay" id="mobilePlayOverlay">
+            <button class="mobile-play-button" id="mobilePlayButton" aria-label="Play video">
+                <svg width="60" height="60" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="30" cy="30" r="30" fill="rgba(86, 252, 138, 0.9)"/>
+                    <path d="M24 18L42 30L24 42V18Z" fill="#1a1a1a"/>
+                </svg>
+            </button>
+        </div>
     </div>
     <div class="video-overlay"></div>
 
@@ -108,22 +117,107 @@
         // Loading Screen
         const loadingScreen = document.getElementById('loadingScreen');
         const bgVideo = document.getElementById('bgVideo');
+        const mobilePlayOverlay = document.getElementById('mobilePlayOverlay');
+        const mobilePlayButton = document.getElementById('mobilePlayButton');
+
+        // Detect mobile device
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                        (window.innerWidth <= 768 && 'ontouchstart' in window);
+
+        // Hide native video controls
+        if (bgVideo) {
+            bgVideo.setAttribute('controls', 'false');
+            bgVideo.removeAttribute('controls');
+            bgVideo.controls = false;
+        }
 
         function hideLoadingScreen() {
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
                 document.body.style.overflow = '';
+                
+                // Show mobile play button if needed
+                if (isMobile && bgVideo && bgVideo.paused) {
+                    mobilePlayOverlay.style.display = 'flex';
+                }
             }, 500);
         }
 
-        // Wait for video to load or timeout after 3 seconds
+        // Mobile video play handler
+        function playVideo() {
+            if (bgVideo) {
+                bgVideo.muted = true; // Ensure muted for autoplay
+                bgVideo.setAttribute('playsinline', 'true');
+                bgVideo.setAttribute('webkit-playsinline', 'true');
+                
+                const playPromise = bgVideo.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.then(() => {
+                        // Video started playing
+                        mobilePlayOverlay.style.display = 'none';
+                        bgVideo.style.opacity = '1';
+                        userInteracted = true;
+                    }).catch(error => {
+                        // Auto-play was prevented
+                        console.log('Video play prevented:', error);
+                        mobilePlayOverlay.style.display = 'flex';
+                    });
+                }
+            }
+        }
+
+        // Keep video playing if it gets paused unexpectedly
+        if (bgVideo) {
+            bgVideo.addEventListener('pause', function() {
+                if (userInteracted && !document.hidden) {
+                    // Only try to resume if user has interacted and page is visible
+                    setTimeout(() => {
+                        if (bgVideo.paused && userInteracted) {
+                            playVideo();
+                        }
+                    }, 100);
+                }
+            });
+        }
+
+        // Mobile play button click
+        if (mobilePlayButton) {
+            mobilePlayButton.addEventListener('click', function() {
+                playVideo();
+            });
+        }
+
+        // Try to play video on any user interaction
+        let userInteracted = false;
+        const interactionEvents = ['touchstart', 'touchend', 'click', 'scroll'];
+        
+        interactionEvents.forEach(event => {
+            document.addEventListener(event, function() {
+                if (!userInteracted && bgVideo && bgVideo.paused) {
+                    userInteracted = true;
+                    playVideo();
+                }
+            }, { once: true, passive: true });
+        });
+
+        // Wait for video to load or timeout after 5 seconds (increased for mobile)
         let videoLoaded = false;
         let timeoutReached = false;
+        const minLoadingTime = isMobile ? 2000 : 1500; // Minimum 2 seconds on mobile
+        const maxLoadingTime = isMobile ? 6000 : 4000; // Maximum 6 seconds on mobile
+        let loadingStartTime = Date.now();
 
         function checkLoading() {
-            if (videoLoaded || timeoutReached) {
+            const elapsed = Date.now() - loadingStartTime;
+            const minTimeReached = elapsed >= minLoadingTime;
+            
+            if ((videoLoaded || timeoutReached) && minTimeReached) {
                 hideLoadingScreen();
+            } else if (!minTimeReached) {
+                // Wait for minimum time
+                setTimeout(checkLoading, 100);
             }
         }
 
@@ -138,21 +232,44 @@
                 videoLoaded = true;
                 checkLoading();
             });
+
+            bgVideo.addEventListener('canplaythrough', function() {
+                videoLoaded = true;
+                checkLoading();
+            });
+
+            // Handle video play errors
+            bgVideo.addEventListener('error', function() {
+                console.log('Video error occurred');
+                timeoutReached = true;
+                checkLoading();
+            });
         }
 
         // Timeout fallback
         setTimeout(function() {
             timeoutReached = true;
             checkLoading();
-        }, 3000);
+        }, maxLoadingTime);
 
         // Also check when page is fully loaded
         window.addEventListener('load', function() {
             setTimeout(function() {
-                timeoutReached = true;
-                checkLoading();
-            }, 500);
+                if (!videoLoaded) {
+                    timeoutReached = true;
+                    checkLoading();
+                }
+            }, 1000);
         });
+
+        // Try to play video after loading screen hides (for desktop)
+        if (!isMobile && bgVideo) {
+            setTimeout(function() {
+                if (bgVideo.paused) {
+                    playVideo();
+                }
+            }, 2500);
+        }
     </script>
 </body>
 </html>
