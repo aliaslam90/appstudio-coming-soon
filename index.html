@@ -21,9 +21,17 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-content">
+            <img src="image/logo.png" alt="AppStudio Logo" class="loading-logo">
+            <div class="loading-circle"></div>
+        </div>
+    </div>
+
     <!-- Background -->
     <div class="video-background">
-        <img id="bgGif" src="video/bg.gif" alt="" class="bg-gif">
+        <video id="bgVideo" src="video/bg1.mp4" autoplay loop muted playsinline class="bg-video"></video>
     </div>
     <div class="video-overlay"></div>
 
@@ -63,9 +71,6 @@
     </div>
 
     <script>
-        // Other page functionality
-
-
         // Modal functionality
         const contactButton = document.getElementById('contactButton');
         const contactModal = document.getElementById('contactModal');
@@ -98,6 +103,55 @@
                 contactModal.classList.remove('active');
                 document.body.style.overflow = '';
             }
+        });
+
+        // Loading Screen
+        const loadingScreen = document.getElementById('loadingScreen');
+        const bgVideo = document.getElementById('bgVideo');
+
+        function hideLoadingScreen() {
+            loadingScreen.style.opacity = '0';
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+                document.body.style.overflow = '';
+            }, 500);
+        }
+
+        // Wait for video to load or timeout after 3 seconds
+        let videoLoaded = false;
+        let timeoutReached = false;
+
+        function checkLoading() {
+            if (videoLoaded || timeoutReached) {
+                hideLoadingScreen();
+            }
+        }
+
+        // Video loaded event
+        if (bgVideo) {
+            bgVideo.addEventListener('loadeddata', function() {
+                videoLoaded = true;
+                checkLoading();
+            });
+
+            bgVideo.addEventListener('canplay', function() {
+                videoLoaded = true;
+                checkLoading();
+            });
+        }
+
+        // Timeout fallback
+        setTimeout(function() {
+            timeoutReached = true;
+            checkLoading();
+        }, 3000);
+
+        // Also check when page is fully loaded
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                timeoutReached = true;
+                checkLoading();
+            }, 500);
         });
     </script>
 </body>

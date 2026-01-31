@@ -23,6 +23,71 @@ body {
     font-family: 'Playfair Display', serif;
     position: relative;
     background: #000;
+    overflow: hidden;
+}
+
+/* Loading Screen */
+.loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.5s ease;
+}
+
+.loading-content {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loading-logo {
+    height: clamp(60px, 10vh, 100px);
+    width: auto;
+    max-width: 300px;
+    z-index: 2;
+    position: relative;
+}
+
+.loading-circle {
+    position: absolute;
+    width: clamp(120px, 20vw, 200px);
+    height: clamp(120px, 20vw, 200px);
+    border: 2px solid rgba(86, 252, 138, 0.3);
+    border-top-color: #56FC8A;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+    z-index: 1;
+}
+
+.loading-circle::before {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 10px;
+    height: 10px;
+    background: #56FC8A;
+    border-radius: 50%;
+    box-shadow: 0 0 10px rgba(86, 252, 138, 0.8);
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 /* Video Background */
@@ -36,8 +101,8 @@ body {
     overflow: hidden;
 }
 
-/* GIF Background */
-.bg-gif {
+/* Video Background */
+.bg-video {
     min-width: 100%;
     min-height: 100%;
     width: auto;
@@ -147,7 +212,7 @@ body {
     font-weight: 300;
     font-size: clamp(1rem, 2.5vh, 1.6rem);
     margin-bottom: clamp(3rem, 7vh, 7rem);
-    color: #00ff88;
+    color: #56FC8A;
     font-style: italic;
 }
 
@@ -157,7 +222,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: clamp(1rem, 2.5vh, 1.5rem) clamp(2.5rem, 5vw, 4rem);
-    background: linear-gradient(135deg, #00ff88 0%, #00ffaa 50%, #00ff88 100%);
+    background: linear-gradient(135deg, #56FC8A 0%, #6AFF9E 50%, #56FC8A 100%);
     color: #1a1a1a;
     text-decoration: none;
     border-radius: 50px;
@@ -168,7 +233,7 @@ body {
     transition: all 0.3s ease;
     border: none;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+    box-shadow: 0 4px 15px rgba(86, 252, 138, 0.3);
     position: relative;
     overflow: hidden;
 }
@@ -221,9 +286,9 @@ body {
 }
 
 .cta-button:hover {
-    background: linear-gradient(135deg, #00cc6f 0%, #00d99a 50%, #00cc6f 100%);
+    background: linear-gradient(135deg, #46DC78 0%, #5AEE8C 50%, #46DC78 100%);
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4), 0 0 25px rgba(0, 200, 255, 0.15);
+    box-shadow: 0 6px 20px rgba(86, 252, 138, 0.4), 0 0 25px rgba(0, 200, 255, 0.15);
 }
 
 .cta-button:active {
@@ -265,11 +330,11 @@ body {
 }
 
 .footer-link:hover {
-    color: #00ff88;
+    color: #56FC8A;
 }
 
 .email-link {
-    color: #00ff88;
+    color: #56FC8A;
     text-decoration: none;
     font-family: 'Playfair Display', serif;
     font-weight: 400;
@@ -281,7 +346,7 @@ body {
 }
 
 .email-link:hover {
-    color: #00cc6f;
+    color: #46DC78;
 }
 
 .copy-button {
@@ -299,8 +364,8 @@ body {
 }
 
 .copy-button:hover {
-    border-color: #00ff88;
-    color: #00ff88;
+    border-color: #56FC8A;
+    color: #56FC8A;
 }
 
 .copyright {
@@ -476,7 +541,7 @@ html {
 
 .modal-close:hover {
     background: rgba(60, 60, 60, 0.9);
-    color: #00ff88;
+    color: #56FC8A;
     transform: rotate(90deg);
 }
 
@@ -506,7 +571,7 @@ html {
     font-family: 'Playfair Display', serif;
     font-weight: 400;
     font-size: clamp(1.4rem, 3.5vh, 2.2rem);
-    color: #00ff88;
+    color: #56FC8A;
     text-align: center;
 }
 
@@ -516,7 +581,7 @@ html {
     justify-content: center;
     width: 100%;
     padding: clamp(0.9rem, 2vh, 1.2rem) clamp(2rem, 4vw, 3rem);
-    background: #00ff88;
+    background: #56FC8A;
     color: #1a1a1a;
     text-decoration: none;
     border-radius: 12px;
@@ -530,7 +595,7 @@ html {
 }
 
 .email-button:hover {
-    background: #00cc6f;
+    background: #46DC78;
     transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0, 255, 136, 0.4);
 }
