@@ -23,52 +23,11 @@
 <body>
     <!-- Video Background -->
     <div class="video-background">
-        <video autoplay muted loop playsinline preload="auto" id="bgVideo">
+        <video autoplay muted loop playsinline webkit-playsinline preload="auto">
             <source src="video/bg.mp4" type="video/mp4">
         </video>
     </div>
     <div class="video-overlay"></div>
-    
-    <!-- Simple video initialization -->
-    <script>
-        (function() {
-            const video = document.getElementById('bgVideo');
-            if (video) {
-                // Set properties immediately
-                video.muted = true;
-                video.playsInline = true;
-                video.setAttribute('playsinline', '');
-                video.setAttribute('webkit-playsinline', '');
-                
-                // Try to play immediately
-                function tryPlay() {
-                    if (video.paused) {
-                        video.play().catch(function() {
-                            // If autoplay fails, play on first user interaction
-                            const playOnInteraction = function() {
-                                video.play();
-                                document.removeEventListener('touchstart', playOnInteraction);
-                                document.removeEventListener('click', playOnInteraction);
-                            };
-                            document.addEventListener('touchstart', playOnInteraction, { once: true });
-                            document.addEventListener('click', playOnInteraction, { once: true });
-                        });
-                    }
-                }
-                
-                // Try immediately
-                tryPlay();
-                
-                // Also try when video is ready
-                if (video.readyState >= 2) {
-                    tryPlay();
-                } else {
-                    video.addEventListener('loadeddata', tryPlay, { once: true });
-                    video.addEventListener('canplay', tryPlay, { once: true });
-                }
-            }
-        })();
-    </script>
 
     <!-- Main Container -->
     <div class="container">
