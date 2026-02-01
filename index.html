@@ -31,7 +31,7 @@
 
     <!-- Background -->
     <div class="video-background">
-        <video id="bgVideo" src="video/bg1.mp4" autoplay loop muted playsinline class="bg-video" preload="auto" webkit-playsinline="true" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" x-webkit-airplay="allow" style="pointer-events: none;"></video>
+        <img id="bgImage" src="video/bg1.gif" alt="Background" class="bg-video">
     </div>
     <div class="video-overlay"></div>
 
@@ -107,75 +107,26 @@
 
         // Loading Screen
         const loadingScreen = document.getElementById('loadingScreen');
-        const bgVideo = document.getElementById('bgVideo');
-
-        // Configure video for autoplay on mobile (mandatory setup)
-        if (bgVideo) {
-            // Explicitly remove controls
-            bgVideo.removeAttribute('controls');
-            bgVideo.controls = false;
-            
-            // Programmatically enforce required attributes
-            bgVideo.muted = true;
-            bgVideo.setAttribute('muted', '');
-            bgVideo.setAttribute('playsinline', '');
-            bgVideo.setAttribute('webkit-playsinline', '');
-            bgVideo.setAttribute('autoplay', 'true');
-            bgVideo.setAttribute('loop', 'true');
-            bgVideo.setAttribute('preload', 'auto');
-            
-            // Force video to be treated as background (no controls)
-            bgVideo.setAttribute('controlsList', 'nodownload nofullscreen noremoteplayback');
-            
-            // Prevent any UI from showing
-            bgVideo.style.pointerEvents = 'none';
-        }
-
-        // Force video playback function with async/await
-        async function forceVideoPlay() {
-            if (!bgVideo) return;
-            
-            try {
-                // Ensure muted is explicitly set to true
-                bgVideo.muted = true;
-                bgVideo.setAttribute('muted', '');
-                bgVideo.setAttribute('playsinline', '');
-                bgVideo.setAttribute('webkit-playsinline', '');
-                
-                // Attempt to play video
-                await bgVideo.play();
-                // Video started playing successfully
-                bgVideo.style.opacity = '1';
-            } catch (error) {
-                // Autoplay was prevented - video will show as background (poster/first frame)
-                // Do NOT show play button - just let it be a static background
-                console.log('Video autoplay prevented by browser:', error);
-                // Keep video visible as static background
-                bgVideo.style.opacity = '1';
-            }
-        }
+        const bgImage = document.getElementById('bgImage');
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
+                        (window.innerWidth <= 768 && 'ontouchstart' in window);
 
         function hideLoadingScreen() {
             loadingScreen.style.opacity = '0';
             setTimeout(() => {
                 loadingScreen.style.display = 'none';
                 // Enable scrolling on mobile
-                const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
-                                (window.innerWidth <= 768 && 'ontouchstart' in window);
                 if (isMobile) {
                     document.body.style.overflowY = 'auto';
                     document.body.style.overflowX = 'hidden';
                 } else {
                     document.body.style.overflow = '';
                 }
-                
-                // Force video playback after loading screen finishes
-                forceVideoPlay();
             }, 500);
         }
 
-        // Wait for video to load or timeout
-        let videoLoaded = false;
+        // Wait for image to load or timeout
+        let imageLoaded = false;
         let timeoutReached = false;
         const minLoadingTime = 2000; // Minimum 2 seconds
         const maxLoadingTime = 5000; // Maximum 5 seconds
@@ -185,7 +136,7 @@
             const elapsed = Date.now() - loadingStartTime;
             const minTimeReached = elapsed >= minLoadingTime;
             
-            if ((videoLoaded || timeoutReached) && minTimeReached) {
+            if ((imageLoaded || timeoutReached) && minTimeReached) {
                 hideLoadingScreen();
             } else if (!minTimeReached) {
                 // Wait for minimum time
@@ -193,49 +144,16 @@
             }
         }
 
-        // Video loaded event - re-try on loadedmetadata as required
-        if (bgVideo) {
-            // Configure video immediately on load
-            bgVideo.muted = true;
-            bgVideo.setAttribute('muted', '');
-            bgVideo.setAttribute('playsinline', '');
-            bgVideo.setAttribute('webkit-playsinline', '');
-            
-            // Re-try on loadedmetadata (required)
-            bgVideo.addEventListener('loadedmetadata', function() {
-                // Ensure attributes are set
-                bgVideo.muted = true;
-                bgVideo.setAttribute('muted', '');
-                bgVideo.setAttribute('playsinline', '');
-                bgVideo.setAttribute('webkit-playsinline', '');
-                // Try to play
-                forceVideoPlay();
-            });
-            
-            bgVideo.addEventListener('loadeddata', function() {
-                videoLoaded = true;
-                // Try to play as soon as data is loaded
-                forceVideoPlay();
+        // Image loaded event
+        if (bgImage) {
+            bgImage.addEventListener('load', function() {
+                imageLoaded = true;
                 checkLoading();
             });
 
-            bgVideo.addEventListener('canplay', function() {
-                videoLoaded = true;
-                // Try to play when video can play
-                forceVideoPlay();
-                checkLoading();
-            });
-
-            bgVideo.addEventListener('canplaythrough', function() {
-                videoLoaded = true;
-                // Ensure playback when fully loaded
-                forceVideoPlay();
-                checkLoading();
-            });
-
-            // Handle video play errors (silently - no UI changes)
-            bgVideo.addEventListener('error', function() {
-                console.log('Video error occurred');
+            // Handle image load errors
+            bgImage.addEventListener('error', function() {
+                console.log('Image error occurred');
                 timeoutReached = true;
                 checkLoading();
             });
@@ -249,26 +167,12 @@
 
         // Also check when page is fully loaded
         window.addEventListener('load', function() {
-            // Force video play on page load
             setTimeout(function() {
-                forceVideoPlay();
-                if (!videoLoaded) {
+                if (!imageLoaded) {
                     timeoutReached = true;
                     checkLoading();
                 }
             }, 1000);
-        });
-
-        // Additional attempt: Force play on DOMContentLoaded
-        document.addEventListener('DOMContentLoaded', function() {
-            if (bgVideo) {
-                bgVideo.muted = true;
-                bgVideo.setAttribute('muted', '');
-                bgVideo.setAttribute('playsinline', '');
-                bgVideo.setAttribute('webkit-playsinline', '');
-                // Try early play attempt
-                setTimeout(forceVideoPlay, 100);
-            }
         });
     </script>
 </body>
