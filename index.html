@@ -31,7 +31,8 @@
 
     <!-- Background -->
     <div class="video-background">
-        <video id="bgVideo" src="video/bg1.mov" autoplay loop muted playsinline class="bg-video" preload="auto" webkit-playsinline="true" disablePictureInPicture controlsList="nodownload nofullscreen noremoteplayback" x-webkit-airplay="allow" style="pointer-events: none;"></video>
+        <video id="bgVideo" src="video/bg1.mov" autoplay loop muted playsinline preload="auto" webkit-playsinline="true" disablePictureInPicture disableRemotePlayback controlsList="nodownload nofullscreen noremoteplayback" x-webkit-airplay="deny" style="display: none;"></video>
+        <canvas id="bgCanvas" class="bg-video"></canvas>
     </div>
     <div class="video-overlay"></div>
 
@@ -108,11 +109,71 @@
         // Loading Screen
         const loadingScreen = document.getElementById('loadingScreen');
         const bgVideo = document.getElementById('bgVideo');
+        const bgCanvas = document.getElementById('bgCanvas');
+        let canvasContext = null;
 
         // Detect Chrome on Android
         const isChromeAndroid = /Chrome/.test(navigator.userAgent) && /Android/.test(navigator.userAgent);
         const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || 
                         (window.innerWidth <= 768 && 'ontouchstart' in window);
+
+        // Setup canvas to render video (prevents browser UI controls)
+        function setupCanvas() {
+            if (!bgCanvas || !bgVideo) return;
+            
+            canvasContext = bgCanvas.getContext('2d');
+            
+            // Set canvas size to match screen
+            function resizeCanvas() {
+                bgCanvas.width = window.innerWidth;
+                bgCanvas.height = window.innerHeight;
+            }
+            
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+            
+            // Render video to canvas with object-fit: cover behavior
+            function drawVideo() {
+                if (bgVideo.readyState >= 2 && canvasContext && bgVideo.videoWidth > 0) {
+                    const videoAspect = bgVideo.videoWidth / bgVideo.videoHeight;
+                    const canvasAspect = bgCanvas.width / bgCanvas.height;
+                    
+                    let drawWidth, drawHeight, drawX, drawY;
+                    
+                    if (videoAspect > canvasAspect) {
+                        // Video is wider - fit to height
+                        drawHeight = bgCanvas.height;
+                        drawWidth = drawHeight * videoAspect;
+                        drawX = (bgCanvas.width - drawWidth) / 2;
+                        drawY = 0;
+                    } else {
+                        // Video is taller - fit to width
+                        drawWidth = bgCanvas.width;
+                        drawHeight = drawWidth / videoAspect;
+                        drawX = 0;
+                        drawY = (bgCanvas.height - drawHeight) / 2;
+                    }
+                    
+                    canvasContext.drawImage(bgVideo, drawX, drawY, drawWidth, drawHeight);
+                }
+                requestAnimationFrame(drawVideo);
+            }
+            
+            // Start drawing when video is ready
+            bgVideo.addEventListener('loadedmetadata', () => {
+                resizeCanvas();
+                drawVideo();
+            });
+            
+            // Also handle when video dimensions are available
+            if (bgVideo.videoWidth > 0) {
+                resizeCanvas();
+                drawVideo();
+            } else {
+                // Start drawing loop even if metadata not loaded yet
+                drawVideo();
+            }
+        }
 
         // Configure video for autoplay on mobile (mandatory setup)
         if (bgVideo) {
@@ -139,9 +200,15 @@
             
             // Force video to be treated as background (no controls)
             bgVideo.setAttribute('controlsList', 'nodownload nofullscreen noremoteplayback');
+            bgVideo.setAttribute('disableRemotePlayback', '');
+            bgVideo.setAttribute('disablePictureInPicture', '');
             
             // Prevent any UI from showing
             bgVideo.style.pointerEvents = 'none';
+            
+            // Try to prevent browser from showing media controls in UI
+            bgVideo.disableRemotePlayback = true;
+            bgVideo.disablePictureInPicture = true;
             
             // Chrome: Ensure video is ready before play attempts
             if (isChromeAndroid) {
@@ -336,6 +403,8 @@
                 bgVideo.setAttribute('muted', '');
                 bgVideo.setAttribute('playsinline', '');
                 bgVideo.setAttribute('webkit-playsinline', '');
+                // Setup canvas rendering
+                setupCanvas();
                 // Try early play attempt
                 setTimeout(forceVideoPlay, 100);
             }
