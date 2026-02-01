@@ -133,7 +133,7 @@ body {
     }
 }
 
-/* Background Image/GIF */
+/* Video Background */
 .bg-video {
     min-width: 100%;
     min-height: 100%;
@@ -149,6 +149,150 @@ body {
     display: block;
     opacity: 1;
     z-index: -1;
+    /* Hide native controls */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+/* Hide native video controls completely */
+.bg-video::-webkit-media-controls {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-enclosure {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-panel {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-play-button {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-start-playback-button {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-timeline {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-current-time-display {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-time-remaining-display {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-mute-button {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-volume-slider {
+    display: none !important;
+}
+
+.bg-video::-webkit-media-controls-fullscreen-button {
+    display: none !important;
+}
+
+/* Hide controls in Firefox */
+.bg-video::-moz-media-controls {
+    display: none !important;
+}
+
+/* Ensure no controls attribute shows */
+video:not([controls]) {
+    -webkit-appearance: none;
+}
+
+/* Additional mobile-specific hiding - ensure NO play button appears */
+.bg-video {
+    /* Prevent any native play overlay on iOS */
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Hide any potential play button overlays on mobile */
+.bg-video::before,
+.bg-video::after {
+    display: none !important;
+    content: none !important;
+}
+
+/* Ensure video poster/thumbnail doesn't show play button */
+.bg-video[poster] {
+    pointer-events: none;
+}
+
+/* Mobile Safari specific - hide any play indicators */
+@media (max-width: 768px) {
+    .bg-video {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+        /* Aggressively hide all controls */
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    
+    /* Ensure no tap-to-play overlay */
+    .bg-video::-webkit-media-controls-overlay-play-button {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+    
+    /* Hide any iOS play button */
+    .bg-video::-webkit-media-controls-start-playback-button {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+    }
+}
+
+/* Chrome Android specific - hide all controls aggressively */
+@media (max-width: 768px) {
+    .bg-video {
+        /* Chrome: Hide all media controls */
+        -webkit-media-controls: none !important;
+        -webkit-media-controls-enclosure: none !important;
+    }
+    
+    /* Chrome: Hide play button overlay */
+    .bg-video::-webkit-media-controls-overlay-enclosure {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+        pointer-events: none !important;
+        width: 0 !important;
+        height: 0 !important;
+    }
+    
+    /* Chrome: Ensure no controls panel */
+    .bg-video::-webkit-media-controls-panel {
+        display: none !important;
+        opacity: 0 !important;
+        visibility: hidden !important;
+    }
+}
+
+/* Additional aggressive hiding for all browsers */
+.bg-video::-webkit-media-controls-overlay-enclosure {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
+}
+
+.bg-video::-webkit-media-controls-enclosure {
+    display: none !important;
+    opacity: 0 !important;
+    visibility: hidden !important;
 }
 
 /* Responsive video adjustments for different screen sizes */
@@ -623,13 +767,13 @@ html {
     scroll-behavior: smooth;
 }
 
-/* Loading state - background image visible immediately */
-.video-background img {
+/* Loading state - video visible immediately */
+.video-background video {
     opacity: 1;
     transition: none;
 }
 
-.video-background img.loaded {
+.video-background video.loaded {
     opacity: 1;
 }
 
