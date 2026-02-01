@@ -9,3 +9,10 @@ Thumbs.db
 node_modules/
 .env
 .env.local
+
+# Video files (too large for git)
+video/*.mov
+video/*.mp4
+video/*.gif
+video/*.avi
+video/*.webm
